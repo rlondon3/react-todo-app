@@ -7,7 +7,7 @@ import Calendar from 'react-calendar';
 import Moment from 'react-moment';
 import 'moment-timezone';
 
-const ToDoModal = ({ thisTodo, show, setShow, func }) => {
+const ToDoModal = ({thisTodo, show, setShow, editTodos }) => {
     const [date, setDate] = useState(new Date());
     const [checked, setChecked] = useState(false)
     const [editTodo, setEditTodo] = useState({
@@ -20,7 +20,6 @@ const ToDoModal = ({ thisTodo, show, setShow, func }) => {
         setShow(false);
         handleSubmit(e)
     };
-    func(editTodo)
    
     const updateToDo = e => {
         const fields = e.target.name;
@@ -29,6 +28,11 @@ const ToDoModal = ({ thisTodo, show, setShow, func }) => {
             [fields]: e.target.value,
             todo_date: date,
         }))
+       if(thisTodo !== editTodo.todo_name) {
+        //Loop through rows to make sure another row does not have the edited name
+        //if so, alert user on submission to choose another name. 
+        document.getElementById(`${thisTodo}`).children[1].innerHTML = e.target.value;
+       };
     }
 
     function toggleChecked() {
@@ -41,6 +45,7 @@ const ToDoModal = ({ thisTodo, show, setShow, func }) => {
 
     function handleSubmit(e) {
         e.preventDefault();
+        
         console.log(editTodo, 'edited')
       }
       
@@ -60,7 +65,7 @@ const ToDoModal = ({ thisTodo, show, setShow, func }) => {
               <Form.Control
                 name='todo_name'
                 type="text"
-                placeholder={(thisTodo) ? thisTodo : editTodo.todo_name}
+                placeholder={thisTodo}
                 autoFocus
                 onChange={updateToDo}
               />

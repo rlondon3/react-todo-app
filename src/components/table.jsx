@@ -7,13 +7,14 @@ import Moment from 'react-moment';
 import 'moment-timezone';
 import React, { useState, useEffect } from 'react';
 
-const TodoTable = ({ editTodo }) => {
+const TodoTable = () => {
     const [todos, setTodos] = useState([]);
     const [todo, setTodo] = useState();
     const [isChecked, setIsChecked] = useState(false);
     const [checked, setChecked] = useState(false);
     const [buttons, showButtons] = useState(false)
     const [show, setShow] = useState(false);
+    const [thisTodo, setThisTodo] = useState("");
 
     
     const date = new Date();
@@ -67,9 +68,14 @@ const TodoTable = ({ editTodo }) => {
         return newState;
       });
     };
-
-    const getEdited = (edited) => {
-      //write code to update table with edited Todo
+    
+    const editTodos = (t) => {
+      setThisTodo(t)
+      setShow(true);
+      if (todos[todos.indexOf(t)] === t ) {
+        setThisTodo(t)
+      }
+      console.log(thisTodo, todos[todos.indexOf(thisTodo)], 'todoss')
     }
 
     const allChecked = (value) => {
@@ -133,16 +139,17 @@ const TodoTable = ({ editTodo }) => {
       <tbody>
         {todos.map((t) => (
         <tr key={todos.indexOf(t)} id={todos[todos.indexOf(t)]}>
+          <ToDoModal
+            thisTodo={thisTodo}
+            id={`${todos[todos.indexOf(t)]}`}
+            editTodos={editTodos}
+            show={show}
+            setShow={setShow}
+          />
           <td>
         <Form>
       {['checkbox'].map((type) => (
         <div key={`default-${type}`} className="mb-3">
-          <ToDoModal
-            thisTodo={t}
-            func={getEdited}
-            show={show}
-            setShow={setShow}
-          />
           <Form.Check 
             type={type}
             id={`${todos[todos.indexOf(t)]}`}
@@ -157,7 +164,7 @@ const TodoTable = ({ editTodo }) => {
         </td>
         <td>{t}</td>
         {(isChecked || checked[t]) ? <>
-        <td><Button variant="warning" onClick={() => setShow(true)}>Edit</Button>{' '}</td>
+        <td><Button variant="warning" onClick={() => editTodos(t)}>Edit</Button>{' '}</td>
         <td><Button variant="danger">Delete</Button>{' '}</td></> :  null}
         </tr>))}
       </tbody>
