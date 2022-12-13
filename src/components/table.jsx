@@ -62,10 +62,17 @@ const TodoTable = () => {
     }
 
     const handleDelete = (t) => {
-      for (let i = 1; i <= t.length; i++) {
-        const checkedTodo = document.getElementById('todoTable').rows[i].children[0].children[0].children[0].children[0].children[0];
+      const todosArray = [...todos]
+      for (let i = 0; i <= t.length; i++) {
+        const checkedTodo = document.getElementById('todoTable').rows[i + 1].children[0].children[0].children[0].children[0].children[0];
           if (checkedTodo.checked === true) {
-            console.log(document.getElementById('todoTable').rows[i])
+            todosArray.forEach(t => {
+              console.log(t)
+              if (t === checkedTodo.id) {
+                todosArray.splice(todosArray.indexOf(t), 1)
+              }
+            })
+            setTodos(todosArray)
           }
       }
     }
