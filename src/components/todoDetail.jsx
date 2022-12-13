@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import UrgencySwitch from './radio';
+import UrgencySwitch from './urgency';
 import Calendar from 'react-calendar';
 import Moment from 'react-moment';
 import 'moment-timezone';

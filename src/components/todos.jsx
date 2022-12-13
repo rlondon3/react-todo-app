@@ -1,8 +1,8 @@
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Input from './input';
-import ToDoModal from './modal'
+import Input from './createTodo';
+import ToDoModal from './todoDetail'
 import Moment from 'react-moment';
 import 'moment-timezone';
 import React, { useState, useEffect } from 'react';
@@ -67,7 +67,6 @@ const TodoTable = () => {
         const checkedTodo = document.getElementById('todoTable').rows[i + 1].children[0].children[0].children[0].children[0].children[0];
           if (checkedTodo.checked === true) {
             todosArray.forEach(t => {
-              console.log(t)
               if (t === checkedTodo.id) {
                 todosArray.splice(todosArray.indexOf(t), 1)
               }

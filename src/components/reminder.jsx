@@ -1,6 +1,5 @@
-import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import TodoTable from './table';
+import TodoTable from './todos';
 import logo from '../img/logo192.png'
 import moment from 'moment/moment';
 import React, { useEffect, useState } from 'react';
