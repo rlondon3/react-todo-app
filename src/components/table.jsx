@@ -30,7 +30,7 @@ const TodoTable = () => {
           } else if (document.getElementById('todoInput').value === '') {
             tr[i].style.backgroundColor = '';
           } else if (tr[i].id.toLowerCase() !== document.getElementById('todoInput').value.toLowerCase()) {
-            tr[i].style.backgroundColor = '';
+            tr[i].style.backgroundColor = ''; 
           }
         }
       }
@@ -42,7 +42,8 @@ const TodoTable = () => {
       filterTodos(t.toLowerCase())
     };
     
-    function getTodo() {
+
+    function addTodo() {
       const todoArray = [...todos];
 
       if (!todo) {
@@ -60,6 +61,46 @@ const TodoTable = () => {
       }
     }
 
+    const handleDelete = (t) => {
+      for (let i = 1; i <= t.length; i++) {
+        const checkedTodo = document.getElementById('todoTable').rows[i].children[0].children[0].children[0].children[0].children[0];
+          if (checkedTodo.checked === true) {
+            console.log(document.getElementById('todoTable').rows[i])
+          }
+      }
+    }
+    
+    const getThisTodo = (t) => {
+      if (todos[todos.indexOf(t)] === t ) {
+        setThisTodo(t)
+        setShow(true);
+        setThisTodo(t)
+      }
+    }
+
+    const editTodos = (edited, orginTodo) => {
+      let rows = document.getElementById('todoTable').rows;
+      const index = todos.indexOf(orginTodo);
+      for (let i = 0; i <= todos.length; i++) {
+        if (edited.todo_name === todos[index] || edited.todo_name === "") {
+          if (rows[i].id === orginTodo) {
+            return rows[i].cells[1].innerHTML = `${orginTodo}`
+          }
+        } else if (todos[i] !== edited.todo_name) {
+          if (rows[i].id === orginTodo) {
+            let todosArray = [...todos];
+            let index = todosArray.indexOf(orginTodo)
+            
+            rows[i].cells[1].innerHTML = edited.todo_name;
+            todosArray.splice(index, 1, edited.todo_name);
+            return setTodos(todosArray);
+          }
+        } else if (todos[i] === edited.todo_name) {
+          return;
+        }
+      }
+    }
+
     const toggleCheck = (inputName) => {
       showButtons(!buttons)
       setChecked((prevState) => {
@@ -68,15 +109,6 @@ const TodoTable = () => {
         return newState;
       });
     };
-    
-    const editTodos = (t) => {
-      setThisTodo(t)
-      setShow(true);
-      if (todos[todos.indexOf(t)] === t ) {
-        setThisTodo(t)
-      }
-      console.log(thisTodo, todos[todos.indexOf(thisTodo)], 'todoss')
-    }
 
     const allChecked = (value) => {
       setIsChecked(value);
@@ -108,12 +140,18 @@ const TodoTable = () => {
   return (
     <>
     <Input 
-    handleChange={handleChange}
-    value={todo || ""}
-    getTodo={getTodo}
-    filterTodos={filterTodos}
+      handleChange={handleChange}
+      value={todo || ""}
+      addTodo={addTodo}
+      filterTodos={filterTodos}
     />
-
+    <ToDoModal
+      thisTodo={thisTodo}
+      todos={todos}
+      editTodos={editTodos}
+      show={show}
+      setShow={setShow}
+    />
     <Table id='todoTable'>
       <thead>
         <tr id='header'>
@@ -133,19 +171,13 @@ const TodoTable = () => {
     </Form>
         </th>
           <th>TO DO</th>
-          {(isChecked  || checked) ? <><th>EDIT TODO</th><th>DELETE TODO</th></> :  null}
+          <th>EDIT TODO</th>
         </tr>
       </thead>
       <tbody>
         {todos.map((t) => (
         <tr key={todos.indexOf(t)} id={todos[todos.indexOf(t)]}>
-          <ToDoModal
-            thisTodo={thisTodo}
-            id={`${todos[todos.indexOf(t)]}`}
-            editTodos={editTodos}
-            show={show}
-            setShow={setShow}
-          />
+          
           <td>
         <Form>
       {['checkbox'].map((type) => (
@@ -163,12 +195,12 @@ const TodoTable = () => {
     </Form>
         </td>
         <td>{t}</td>
-        {(isChecked || checked[t]) ? <>
-        <td><Button variant="warning" onClick={() => editTodos(t)}>Edit</Button>{' '}</td>
-        <td><Button variant="danger">Delete</Button>{' '}</td></> :  null}
+        <td><Button variant="warning" onClick={() => getThisTodo(t)}>Edit</Button>{' '}</td>
         </tr>))}
       </tbody>
+      
     </Table>
+        <Button variant="danger" style={{backgroundColor: '#dc3545'}} onClick={() => handleDelete(todos)}>Delete</Button>
     </>
   );
 }

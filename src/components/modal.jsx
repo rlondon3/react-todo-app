@@ -7,7 +7,7 @@ import Calendar from 'react-calendar';
 import Moment from 'react-moment';
 import 'moment-timezone';
 
-const ToDoModal = ({thisTodo, show, setShow, editTodos }) => {
+const ToDoModal = ({ todos, thisTodo, show, setShow, editTodos }) => {
     const [date, setDate] = useState(new Date());
     const [checked, setChecked] = useState(false)
     const [editTodo, setEditTodo] = useState({
@@ -28,11 +28,6 @@ const ToDoModal = ({thisTodo, show, setShow, editTodos }) => {
             [fields]: e.target.value,
             todo_date: date,
         }))
-       if(thisTodo !== editTodo.todo_name) {
-        //Loop through rows to make sure another row does not have the edited name
-        //if so, alert user on submission to choose another name. 
-        document.getElementById(`${thisTodo}`).children[1].innerHTML = e.target.value;
-       };
     }
 
     function toggleChecked() {
@@ -45,9 +40,20 @@ const ToDoModal = ({thisTodo, show, setShow, editTodos }) => {
 
     function handleSubmit(e) {
         e.preventDefault();
+
+        for (let i = 0; i < todos.length; i++) {
+          const index = todos.indexOf(thisTodo);
+          if (editTodo.todo_name === todos[index]) {
+            return editTodos(editTodo, thisTodo)
+          } else if (todos[i] !== editTodo.todo_name) {
+            editTodos(editTodo, thisTodo)
+          }else if (todos[i] === editTodo.todo_name) {
+            return alert('Todo Already Exists!')
+          } 
+        }
         
-        console.log(editTodo, 'edited')
-      }
+
+    }
       
 
   return (

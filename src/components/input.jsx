@@ -4,11 +4,11 @@ import { Container } from 'react-bootstrap';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-const Input = ({ handleChange, value, getTodo }) => {
+const Input = ({ handleChange, value, addTodo }) => {
   
   function handleSubmit(e) {
     e.preventDefault();
-    getTodo();
+    addTodo();
     
     if (e.key === 'Enter') return value;
     document.getElementById('todoInput').value = '';
