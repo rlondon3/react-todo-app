@@ -130,6 +130,10 @@ const TodoTable = () => {
 
 
     useEffect(() => {
+      fetch("http://localhost:5001/api")
+      .then(res => res.json())
+      .then(response => console.log(response));
+
       let allChecked = true;
       for (const inputName in checked) {
         if (checked[inputName] === false) {
