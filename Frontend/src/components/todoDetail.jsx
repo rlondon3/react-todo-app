@@ -7,35 +7,20 @@ import Calendar from 'react-calendar';
 import Moment from 'react-moment';
 import 'moment-timezone';
 
-const ToDoModal = ({ todos, thisTodo, show, setShow, editTodos }) => {
-    const [date, setDate] = useState(new Date());
-    const [checked, setChecked] = useState(false)
-    const [editTodo, setEditTodo] = useState({
-        todo_name: "",
-        todo_date: "",
-        todo_note: "",
-        isUrgent: ""
-    });
+const ToDoDetail = ({ todos, thisTodo, show, setShow, editTodo, setEditTodo, editTodos, date, setDate, updateToDo }) => {
+    const [checked, setChecked] = useState(false);
+    
     const handleClose = (e) => {
         setShow(false);
-        handleSubmit(e)
+        handleSubmit(e);
     };
-   
-    const updateToDo = e => {
-        const fields = e.target.name;
-        setEditTodo(existingVal => ({
-            ...existingVal,
-            [fields]: e.target.value,
-            todo_date: date,
-        }))
-    }
 
     function toggleChecked() {
         setChecked(!checked);
         setEditTodo(existingVal => ({
             ...existingVal,
             isUrgent: checked
-        }))
+        }));
     }
 
     function handleSubmit(e) {
@@ -44,18 +29,15 @@ const ToDoModal = ({ todos, thisTodo, show, setShow, editTodos }) => {
         for (let i = 0; i < todos.length; i++) {
           const index = todos.indexOf(thisTodo);
           if (editTodo.todo_name === todos[index]) {
-            return editTodos(editTodo, thisTodo)
+            return editTodos(editTodo, thisTodo);
           } else if (todos[i] !== editTodo.todo_name) {
-            editTodos(editTodo, thisTodo)
+            editTodos(editTodo, thisTodo);
           }else if (todos[i] === editTodo.todo_name) {
-            return alert('Todo Already Exists!')
+            return alert('Todo Already Exists!');
           } 
         }
-        
-
     }
       
-
   return (
     <>
       <Modal size="sm" show={show} onHide={handleClose}>
@@ -117,4 +99,4 @@ const ToDoModal = ({ todos, thisTodo, show, setShow, editTodos }) => {
   );
 }
 
-export default ToDoModal;
+export default ToDoDetail;

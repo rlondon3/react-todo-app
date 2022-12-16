@@ -19,5 +19,5 @@ app.use('/api/todos', todoList)
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 app.get('/', (req, res) => {
-    res.send('Hello! Im the React To Do App Backend...')
+    res.json({message: 'Hello! Im the React To Do App Backend...'})
 })
