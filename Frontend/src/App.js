@@ -6,34 +6,34 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import logo from './img/logo192.png';
 import moment from 'moment/moment';
+import axios from 'axios';
 import './App.css';
 import Todos from './components/todos';
 import CreateTodo from './components/createTodo';
 import ToDoDetail from './components/todoDetail';
 
 function App() {
-  const [backendMessage, setBackendMessage] = useState("");
+  const initialState = {
+    date_created: "",
+    due_date: "",
+    is_urgent: "",
+    name: "",
+    todo_detail: "",
+    id: ""
+  };
+  
   const [time, setTime] = useState(moment().format('LTS'));
   const [show, setShow] = useState(false);
   const [todos, setTodos] = useState([]);
-  const [todo, setTodo] = useState();
-  const [editTodo, setEditTodo] = useState({
-    todo_name: "",
-    todo_date: "",
-    todo_note: "",
-    isUrgent: ""
-});
+  const [todo, setTodo] = useState("");
+  const [editTodo, setEditTodo] = useState("");
   //const [buttons, showButtons] = useState(false)
   
   const [thisTodo, setThisTodo] = useState("");
+  const [dateCreated, setDateCreated] = useState("");
   const [date, setDate] = useState(new Date());
   
-  const fetchTodos = () => {
-    fetch("http://localhost:5001")
-      .then((res) => res.json())
-      .then((data) => setBackendMessage(data.message));
-  }
-
+  
   const getThisTodo = (t) => {
     if (todos[todos.indexOf(t)] === t ) {
       setThisTodo(t)
@@ -99,11 +99,38 @@ function App() {
       }, [time]);
 
     useEffect(() => {
+      async function fetchTodos() {
+        try {
+          const response = await axios.get("http://localhost:5001/api/todos");
+          const fetchedTodos = [];  
+          let todo_detail = {}
+          let date_created;
+
+          response.data.forEach((todo) => {
+            fetchedTodos.push(todo.name);
+            date_created = todo.date_created;
+            todo_detail.todo_note = todo.todo_detail;
+            todo_detail.date = todo.due_date;
+            todo_detail.name = todo.name;
+            todo_detail.isUrgent = todo.is_urgent;
+          })
+          setTodos(fetchedTodos);
+          setDateCreated(date_created)
+          setEditTodo(todo_detail);
+          console.log(response.data);
+          console.log(editTodo)
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
       fetchTodos();
-    }, [])
+      // eslint-disable-next-line
+    }, []); 
 
   return (
     <>
+    {initialState && (
       <Container className="container mt-5">
           <Row className="justify-content-md-center">
             <Col md="auto">
@@ -132,16 +159,17 @@ function App() {
                       />
                       <Todos 
                       todos={todos}
-                      date={date}
+                      dateCreated={dateCreated}
                       getThisTodo={getThisTodo}
                       />
                       <Button variant="danger" style={{backgroundColor: '#dc3545'}} onClick={() => handleDelete(todos)}>Delete</Button>
                   </Card.Body>
-                <Card.Footer style={{ backgroundColor: '#61DBFB'}} className="text-muted">{backendMessage}</Card.Footer>
+                <Card.Footer style={{ backgroundColor: '#61DBFB'}} className="text-muted">Hello</Card.Footer>
               </Card>
             </Col>
         </Row>
     </Container>
+    )}
   </>
   );
 }

@@ -6,7 +6,7 @@ import Moment from 'react-moment';
 import 'moment-timezone';
 
 
-const Todos = ({ todos, getThisTodo, date }) => {
+const Todos = ({ todos, getThisTodo, dateCreated }) => {
   const [isChecked, setIsChecked] = useState(false);
   const [checked, setChecked] = useState(false);
 
@@ -86,7 +86,7 @@ const Todos = ({ todos, getThisTodo, date }) => {
               onChange={() => toggleCheck(t)}
               checked={checked[t]}
             />
-            <Moment format="MM/DD/YYYY">{date}</Moment>
+            <Moment format="MM/DD/YYYY" utc>{dateCreated}</Moment>
           </div>
         ))}
       </Form>

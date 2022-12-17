@@ -58,10 +58,10 @@ const ToDoDetail = ({ todos, thisTodo, show, setShow, editTodo, setEditTodo, edi
                 onChange={updateToDo}
               />
               <br />
-              <Form.Label>Due Date: <Moment format="MM/DD/YYYY">{date}</Moment></Form.Label>
+              <Form.Label>Due Date: <Moment format="MM/DD/YYYY" utc>{editTodo.date}</Moment></Form.Label>
               <Calendar
                 name='todo_date'
-                value={date}
+                value={new Date(editTodo.date)}
                 onChange={setDate}
               />
               
