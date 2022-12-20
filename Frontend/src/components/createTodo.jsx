@@ -3,23 +3,18 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { Container } from 'react-bootstrap';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import moment from 'moment';
 
-const CreateTodo = ({ value, todos, todo, setTodos, setTodo }) => {
+const CreateTodo = ({ value, todoB, addTodo, setTodoB }) => {
   
-  function addTodo() {
-    const todoArray = [...todos];
-
-    if (!todo) {
+  function checkInput() {
+    if (!todoB) {
       document.getElementById('todoInput').style.borderColor = 'red';
       document.getElementById('todoInput').classList = 'form-control shadow-none';
       return;
     } else {
       document.getElementById('todoInput').style.removeProperty('border-color');
       document.getElementById('todoInput').classList = 'form-control';
-      if (todos.indexOf(todo) === -1) {
-        todoArray.push(todo);
-        setTodos(todoArray);
-      }
     }
   }
 
@@ -42,16 +37,22 @@ const CreateTodo = ({ value, todos, todo, setTodos, setTodo }) => {
 
   function handleChange(e) {
     const t = e.target.value;
-    setTodo(t);
+    const date = moment().format('L');
+    const todoArr = {
+      name: t,
+      date_created: date
+    };
+    setTodoB(todoArr)
     filterTodos(t.toLowerCase())
   };
 
   function handleSubmit(e) {
     e.preventDefault();
-    addTodo();
     
     if (e.key === 'Enter') return value;
     document.getElementById('todoInput').value = '';
+    checkInput();
+    addTodo();
   }
   
   return (

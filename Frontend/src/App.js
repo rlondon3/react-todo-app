@@ -24,19 +24,36 @@ function App() {
   
   const [time, setTime] = useState(moment().format('LTS'));
   const [show, setShow] = useState(false);
-  const [todos, setTodos] = useState([]);
-  const [todo, setTodo] = useState("");
+  const [todosB, setTodosB] = useState([]);
+  const [todoB, setTodoB] = useState("");
   const [editTodo, setEditTodo] = useState("");
   //const [buttons, showButtons] = useState(false)
   
   const [thisTodo, setThisTodo] = useState("");
-  const [dateCreated, setDateCreated] = useState("");
-  const [date, setDate] = useState(new Date());
   
   
+  const addTodo = () => {
+    const todosArrayB = [...todosB]
+      if (todosB.indexOf(todoB) === -1) {
+        todosArrayB.push(todoB);
+        setTodosB(todosArrayB);
+        if (todoB !== "" ){
+          axios.post('http://localhost:5001/api/todos', {
+            name: todoB.name,
+          })
+          .then(function (response) {
+            console.log(response.status, 'To Do Added!');
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        }
+      }
+    }
+    
+
   const getThisTodo = (t) => {
-    if (todos[todos.indexOf(t)] === t ) {
-      setThisTodo(t)
+    if (todosB[todosB.indexOf(t)] === t ) {
       setShow(true);
       setThisTodo(t)
     }
@@ -44,38 +61,29 @@ function App() {
 
   const editTodos = (edited, orginTodo) => {
     let rows = document.getElementById('todoTable').rows;
-    const index = todos.indexOf(orginTodo);
-    for (let i = 0; i <= todos.length; i++) {
-      if (edited.todo_name === todos[index] || edited.todo_name === "") {
+    const index = todosB.indexOf(orginTodo);
+    for (let i = 0; i <= todosB.length; i++) {
+      if (edited.todo_name === todosB[index].name || edited.todo_name === "") {
         if (rows[i].id === orginTodo) {
           return rows[i].cells[1].innerHTML = `${orginTodo}`
         }
-      } else if (todos[i] !== edited.todo_name) {
+      } else if (todosB[i].name !== edited.todo_name) {
         if (rows[i].id === orginTodo) {
-          let todosArray = [...todos];
+          let todosArray = [...todosB];
           let index = todosArray.indexOf(orginTodo)
           
           rows[i].cells[1].innerHTML = edited.todo_name;
           todosArray.splice(index, 1, edited.todo_name);
-          return setTodos(todosArray);
+          return setTodosB(todosArray);
         }
-      } else if (todos[i] === edited.todo_name) {
+      } else if (todosB[i].name === edited.todo_name) {
         return;
       }
     }
   }
 
-  const updateToDo = e => {
-    const fields = e.target.name;
-    setEditTodo(existingVal => ({
-        ...existingVal,
-        [fields]: e.target.value,
-        todo_date: date,
-    }))
-}
-
   const handleDelete = (t) => {
-    const todosArray = [...todos]
+    const todosArray = [...todosB]
     for (let i = 0; i <= t.length; i++) {
       const checkedTodo = document.getElementById('todoTable').rows[i + 1].children[0].children[0].children[0].children[0].children[0];
         if (checkedTodo.checked === true) {
@@ -84,7 +92,7 @@ function App() {
               todosArray.splice(todosArray.indexOf(t), 1)
             }
           })
-          setTodos(todosArray)
+          setTodosB(todosArray)
         }
     }
   }
@@ -102,23 +110,20 @@ function App() {
       async function fetchTodos() {
         try {
           const response = await axios.get("http://localhost:5001/api/todos");
-          const fetchedTodos = [];  
-          let todo_detail = {}
-          let date_created;
+          const fetchedTodosB = [...todosB];  
 
           response.data.forEach((todo) => {
-            fetchedTodos.push(todo.name);
-            date_created = todo.date_created;
-            todo_detail.todo_note = todo.todo_detail;
-            todo_detail.date = todo.due_date;
-            todo_detail.name = todo.name;
-            todo_detail.isUrgent = todo.is_urgent;
-          })
-          setTodos(fetchedTodos);
-          setDateCreated(date_created)
-          setEditTodo(todo_detail);
-          console.log(response.data);
-          console.log(editTodo)
+            fetchedTodosB.push({
+              id: todo._id,
+              name: todo.name,
+              date_created: todo.date_created,
+              todo_note: (!todo.todo_detail) ? null : todo.todo_detail,
+              due_date: (!todo.due_date) ? null : todo.due_date,
+              isUrgent: (!todo.is_urgent) ? null : todo.is_urgent,
+            });
+          });
+          
+          setTodosB(fetchedTodosB);
         } catch (error) {
           console.error(error);
         }
@@ -139,30 +144,26 @@ function App() {
                   <Card.Body>
                     <Card.Title><img src={logo} alt='Logo' style={{ width: 100, height: 100 }} /> To Do App</Card.Title>
                       <CreateTodo
-                      value={todo || ""}
-                      todo={todo}
-                      todos={todos}
-                      setTodo={setTodo}
-                      setTodos={setTodos}
+                      value={todoB || ""}
+                      todoB={todoB}
+                      setTodoB={setTodoB}
+                      addTodo={addTodo}
                       />
                       <ToDoDetail
-                      date={date}
-                      setDate={setDate} 
                       thisTodo={thisTodo}
-                      todos={todos}
+                      todosB={todosB}
                       editTodos={editTodos}
                       editTodo={editTodo}
                       setEditTodo={setEditTodo}
-                      updateToDo={updateToDo}
                       show={show}
                       setShow={setShow}
                       />
                       <Todos 
-                      todos={todos}
-                      dateCreated={dateCreated}
+                      todosB={todosB}
+                      editTodo={editTodo}
                       getThisTodo={getThisTodo}
                       />
-                      <Button variant="danger" style={{backgroundColor: '#dc3545'}} onClick={() => handleDelete(todos)}>Delete</Button>
+                      <Button variant="danger" style={{backgroundColor: '#dc3545'}} onClick={() => handleDelete(todosB)}>Delete</Button>
                   </Card.Body>
                 <Card.Footer style={{ backgroundColor: '#61DBFB'}} className="text-muted">Hello</Card.Footer>
               </Card>

@@ -14,7 +14,6 @@ const todoSchema = new mongoose.Schema({
     },
     due_date: {
         type: String,
-        required: true,
     },
     todo_detail: {
         type: String,
@@ -23,7 +22,6 @@ const todoSchema = new mongoose.Schema({
     },
     is_urgent: {
         type: Boolean,
-        required: true
     }
 });
 
@@ -31,10 +29,10 @@ const Todo= mongoose.model('Todo', todoSchema);
 
 function handleErrors(todo) {
     const schema = Joi.object({
-        name: Joi.string().min(3).max(30).required(),
-        due_date: Joi.string().required(),
+        name: Joi.string().min(3).max(30),
+        due_date: Joi.string(),
         todo_detail: Joi.string(),
-        is_urgent: Joi.boolean().required()
+        is_urgent: Joi.boolean()
     });
     return schema.validate(todo);
 }

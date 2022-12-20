@@ -6,11 +6,12 @@ import Moment from 'react-moment';
 import 'moment-timezone';
 
 
-const Todos = ({ todos, getThisTodo, dateCreated }) => {
+const Todos = ({ todosB, getThisTodo, editTodo }) => {
   const [isChecked, setIsChecked] = useState(false);
   const [checked, setChecked] = useState(false);
 
   const toggleCheck = (inputName) => {
+    console.log(editTodo, 'EDIT')
     //showButtons(!buttons)
     setChecked((prevState) => {
       const newState = { ...prevState };
@@ -33,6 +34,7 @@ const Todos = ({ todos, getThisTodo, dateCreated }) => {
 
 
     useEffect(() => {
+      
       let allChecked = true;
 
       for (const inputName in checked) {
@@ -60,7 +62,7 @@ const Todos = ({ todos, getThisTodo, dateCreated }) => {
             <Form.Check 
               type={type}
               id='checkAll'
-              label={`Select All Todos`}
+              label={`Select All`}
               onChange={(e) => allChecked(e.target.checked)}
               checked={isChecked}
             />
@@ -69,29 +71,29 @@ const Todos = ({ todos, getThisTodo, dateCreated }) => {
       </Form>
           </th>
             <th>TO DO</th>
-            <th>EDIT TODO</th>
+            <th>EDIT</th>
           </tr>
         </thead>
         <tbody>
-          {todos.map((t) => (
-          <tr key={todos.indexOf(t)} id={todos[todos.indexOf(t)]}>
+          {todosB.map((t, index) => (
+          <tr key={index} id={todosB[todosB.indexOf(t)]}>
             <td>
           <Form>
         {['checkbox'].map((type) => (
           <div key={`default-${type}`} className="mb-3">
             <Form.Check 
               type={type}
-              id={`${todos[todos.indexOf(t)]}`}
-              label={`Select Todo From `}
+              id={`${todosB[todosB.indexOf(t)]}`}
+              label={`Created On `}
               onChange={() => toggleCheck(t)}
               checked={checked[t]}
             />
-            <Moment format="MM/DD/YYYY" utc>{dateCreated}</Moment>
+            <Moment format="MM/DD/YYYY" utc>{t.date_created}</Moment>
           </div>
         ))}
       </Form>
           </td>
-          <td>{t}</td>
+          <td>{t.name}</td>
           <td><Button variant="warning" onClick={() => getThisTodo(t)}>Edit</Button>{' '}</td>
           </tr>))}
         </tbody>

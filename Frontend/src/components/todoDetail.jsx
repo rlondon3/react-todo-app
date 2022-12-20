@@ -4,17 +4,28 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import UrgencySwitch from './urgency';
 import Calendar from 'react-calendar';
-import Moment from 'react-moment';
+import moment from 'moment/moment';
 import 'moment-timezone';
 
-const ToDoDetail = ({ todos, thisTodo, show, setShow, editTodo, setEditTodo, editTodos, date, setDate, updateToDo }) => {
+const ToDoDetail = ({ todosB, thisTodo, show, setShow, editTodo, setEditTodo, editTodos }) => {
     const [checked, setChecked] = useState(false);
+    const [value, setValue] = useState(thisTodo.due_date);
     
     const handleClose = (e) => {
         setShow(false);
         handleSubmit(e);
     };
 
+    const updateToDo = e => {
+        const fields = e.target.name;
+        setEditTodo(existingVal => ({
+            ...existingVal,
+            [fields]: e.target.value,
+            due_date: value,
+        }));
+
+        console.log(editTodo, 'update')
+    }
     function toggleChecked() {
         setChecked(!checked);
         setEditTodo(existingVal => ({
@@ -26,13 +37,13 @@ const ToDoDetail = ({ todos, thisTodo, show, setShow, editTodo, setEditTodo, edi
     function handleSubmit(e) {
         e.preventDefault();
 
-        for (let i = 0; i < todos.length; i++) {
-          const index = todos.indexOf(thisTodo);
-          if (editTodo.todo_name === todos[index]) {
+        for (let i = 0; i < todosB.length; i++) {
+          const index = todosB.indexOf(thisTodo);
+          if (editTodo.todo_name === todosB[index].name) {
             return editTodos(editTodo, thisTodo);
-          } else if (todos[i] !== editTodo.todo_name) {
+          } else if (todosB[i].name !== editTodo.todo_name) {
             editTodos(editTodo, thisTodo);
-          }else if (todos[i] === editTodo.todo_name) {
+          }else if (todosB[i].name === editTodo.todo_name) {
             return alert('Todo Already Exists!');
           } 
         }
@@ -51,18 +62,23 @@ const ToDoDetail = ({ todos, thisTodo, show, setShow, editTodo, setEditTodo, edi
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label>To Do:</Form.Label>
               <Form.Control
-                name='todo_name'
+                name='name'
                 type="text"
-                placeholder={thisTodo}
+                placeholder={thisTodo.name}
                 autoFocus
                 onChange={updateToDo}
               />
               <br />
-              <Form.Label>Due Date: <Moment format="MM/DD/YYYY" utc>{editTodo.date}</Moment></Form.Label>
+              {
+              (thisTodo.due_date !== null) ? 
+              <Form.Label>Current Due Date: {moment(thisTodo.due_date).format('L')}</Form.Label> :
+              <Form.Label>Set Due Date: {moment(value).format('L')}</Form.Label>
+              }
               <Calendar
                 name='todo_date'
-                value={new Date(editTodo.date)}
-                onChange={setDate}
+                defaultValue={(thisTodo.due_date !== null) ? new Date(thisTodo.due_date) : value}
+                value={value}
+                onChange={(value) => setValue(value)}
               />
               
             </Form.Group>
@@ -73,9 +89,9 @@ const ToDoDetail = ({ todos, thisTodo, show, setShow, editTodo, setEditTodo, edi
               <Form.Label>To Do Notes:</Form.Label>
               <Form.Control 
               as="textarea" 
-              name='todo_note'
+              name='todo_detail'
               rows={3}
-              placeholder={editTodo.todo_note}
+              placeholder={(thisTodo.todo_note === null) ? "No Important Details" : thisTodo.todo_note}
               onChange={updateToDo}
                />
             </Form.Group>
