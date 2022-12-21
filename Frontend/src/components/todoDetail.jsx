@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
@@ -7,46 +7,42 @@ import Calendar from 'react-calendar';
 import moment from 'moment/moment';
 import 'moment-timezone';
 
-const ToDoDetail = ({ todosB, thisTodo, show, setShow, editTodo, setEditTodo, editTodos }) => {
-    const [checked, setChecked] = useState(false);
-    const [value, setValue] = useState(thisTodo.due_date);
+const ToDoDetail = ({ value, checked, todosB, thisTodo, show, setShow, setChecked, setThisTodo, setTodosB, setValue, preventDuplicates, checkInput, updateToDo, handleUpdate}) => {
     
     const handleClose = (e) => {
         setShow(false);
-        handleSubmit(e);
     };
-
-    const updateToDo = e => {
-        const fields = e.target.name;
-        setEditTodo(existingVal => ({
-            ...existingVal,
-            [fields]: e.target.value,
-            due_date: value,
-        }));
-
-        console.log(editTodo, 'update')
+    
+    function onChange (e) {
+      const fields = e.target.name;
+      setChecked(!checked);
+      setThisTodo(existingVal => ({
+          ...existingVal,
+          [fields]: e.target.value,
+          due_date: value,
+          is_urgent: !checked
+      }));
     }
-    function toggleChecked() {
-        setChecked(!checked);
-        setEditTodo(existingVal => ({
-            ...existingVal,
-            isUrgent: checked
-        }));
-    }
-
     function handleSubmit(e) {
         e.preventDefault();
+        
+        const input = document.getElementById('updateName');
+        const id = input.id
+        const todosArray = [...todosB];
+        const index = todosArray.findIndex(obj => obj.id === thisTodo.id);
 
-        for (let i = 0; i < todosB.length; i++) {
-          const index = todosB.indexOf(thisTodo);
-          if (editTodo.todo_name === todosB[index].name) {
-            return editTodos(editTodo, thisTodo);
-          } else if (todosB[i].name !== editTodo.todo_name) {
-            editTodos(editTodo, thisTodo);
-          }else if (todosB[i].name === editTodo.todo_name) {
-            return alert('Todo Already Exists!');
-          } 
+        for (let i = 0; i < todosArray.length; i++) {
+          if (todosArray[i].id !== thisTodo.id) {
+            if (todosArray[i].name === thisTodo.name) {
+              preventDuplicates();
+              return checkInput(id);
+            }
+          }
         }
+        handleUpdate();
+        todosArray.splice(index, 1, thisTodo);
+        setTodosB(todosArray);
+        handleClose(e);
     }
       
   return (
@@ -59,14 +55,14 @@ const ToDoDetail = ({ todosB, thisTodo, show, setShow, editTodo, setEditTodo, ed
           <Form
           onSubmit={(e) => handleSubmit(e)}
           >
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Form.Group className="mb-3" controlId="updateName">
               <Form.Label>To Do:</Form.Label>
               <Form.Control
                 name='name'
                 type="text"
                 placeholder={thisTodo.name}
                 autoFocus
-                onChange={updateToDo}
+                onChange={onChange}
               />
               <br />
               {
@@ -76,7 +72,7 @@ const ToDoDetail = ({ todosB, thisTodo, show, setShow, editTodo, setEditTodo, ed
               }
               <Calendar
                 name='todo_date'
-                defaultValue={(thisTodo.due_date !== null) ? new Date(thisTodo.due_date) : value}
+                //defaultValue={(thisTodo.due_date !== null) ? new Date(thisTodo.due_date) : value}
                 value={value}
                 onChange={(value) => setValue(value)}
               />
@@ -89,24 +85,24 @@ const ToDoDetail = ({ todosB, thisTodo, show, setShow, editTodo, setEditTodo, ed
               <Form.Label>To Do Notes:</Form.Label>
               <Form.Control 
               as="textarea" 
-              name='todo_detail'
+              name='todo_note'
               rows={3}
               placeholder={(thisTodo.todo_note === null) ? "No Important Details" : thisTodo.todo_note}
-              onChange={updateToDo}
+              onChange={onChange}
                />
             </Form.Group>
           </Form>
           <UrgencySwitch
-          handleChange={toggleChecked}
+          onChange={onChange}
           updateToDo={updateToDo}
-          value={checked}
+          checked={checked}
           />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={handleSubmit}>
             Save To Do
           </Button>
         </Modal.Footer>

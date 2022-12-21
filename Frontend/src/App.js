@@ -21,16 +21,57 @@ function App() {
     todo_detail: "",
     id: ""
   };
-  
+  const [value, setValue] = useState(new Date());
   const [time, setTime] = useState(moment().format('LTS'));
   const [show, setShow] = useState(false);
   const [todosB, setTodosB] = useState([]);
   const [todoB, setTodoB] = useState("");
-  const [editTodo, setEditTodo] = useState("");
-  //const [buttons, showButtons] = useState(false)
+  const [checked, setChecked] = useState(false);
   
   const [thisTodo, setThisTodo] = useState("");
   
+  function checkInput(inputId) {
+    if (!todoB) {
+      document.getElementById(`${inputId}`).style.borderColor = 'red';
+      document.getElementById(`${inputId}`).classList = 'form-control shadow-none';
+      return;
+    } else {
+      document.getElementById(`${inputId}`).style.removeProperty('border-color');
+      document.getElementById(`${inputId}`).classList = 'form-control';
+    }
+  }
+
+  function preventDuplicates() {
+    const todosArray = [...todosB];
+    for (let i = 0; i < todosArray.length; i++) {
+      if (document.getElementById('todoInput').value === todosArray[i].name) {
+        return alert('This To Do already exists. Please use another name.');
+      } 
+      if (todosArray[i].id !== thisTodo.id) {
+        if (todosArray[i].name === thisTodo.name) {
+          return alert('This To Do already exists. Please use another name.');
+        }
+      }
+    }
+    //addTodo();
+  }
+
+  function filterTodos(t) {
+    const table = document.getElementById('todoTable');
+    const tr = table.getElementsByTagName('tr');
+
+    for (let i = 0; i < tr.length; i++) {
+      if (tr[i]) {
+        if (tr[i].id.toLowerCase() === document.getElementById('todoInput').value.toLowerCase()) {
+          tr[i].style.backgroundColor = 'rgb(184, 201, 204)';
+        } else if (document.getElementById('todoInput').value === '') {
+          tr[i].style.backgroundColor = '';
+        } else if (tr[i].id.toLowerCase() !== document.getElementById('todoInput').value.toLowerCase()) {
+          tr[i].style.backgroundColor = ''; 
+        }
+      }
+    }
+  }
   
   const addTodo = () => {
     const todosArrayB = [...todosB]
@@ -50,53 +91,54 @@ function App() {
         }
       }
     }
-    
 
-  const getThisTodo = (t) => {
-    if (todosB[todosB.indexOf(t)] === t ) {
-      setShow(true);
-      setThisTodo(t)
-    }
-  }
-
-  const editTodos = (edited, orginTodo) => {
-    let rows = document.getElementById('todoTable').rows;
-    const index = todosB.indexOf(orginTodo);
-    for (let i = 0; i <= todosB.length; i++) {
-      if (edited.todo_name === todosB[index].name || edited.todo_name === "") {
-        if (rows[i].id === orginTodo) {
-          return rows[i].cells[1].innerHTML = `${orginTodo}`
-        }
-      } else if (todosB[i].name !== edited.todo_name) {
-        if (rows[i].id === orginTodo) {
-          let todosArray = [...todosB];
-          let index = todosArray.indexOf(orginTodo)
-          
-          rows[i].cells[1].innerHTML = edited.todo_name;
-          todosArray.splice(index, 1, edited.todo_name);
-          return setTodosB(todosArray);
-        }
-      } else if (todosB[i].name === edited.todo_name) {
-        return;
+    const getThisTodo = (t) => {
+      if (todosB[todosB.indexOf(t)] === t ) {
+        setShow(true);
+        setThisTodo(t)
       }
     }
-  }
 
-  const handleDelete = (t) => {
-    const todosArray = [...todosB]
-    for (let i = 0; i <= t.length; i++) {
-      const checkedTodo = document.getElementById('todoTable').rows[i + 1].children[0].children[0].children[0].children[0].children[0];
-        if (checkedTodo.checked === true) {
-          todosArray.forEach(t => {
-            if (t === checkedTodo.id) {
-              todosArray.splice(todosArray.indexOf(t), 1)
-            }
+    const updateToDo = e => {
+     
+    }
+    const handleUpdate = () => {
+      const todosArray = [...todosB]
+      const index = todosArray.findIndex(obj => obj.id === thisTodo.id);
+      console.log(thisTodo.due_date, todosArray[index].due_date)
+      if (todosArray[index].name !== thisTodo.name || 
+        todosArray[index].due_date !== thisTodo.due_date ||
+        todosArray[index].todo_note !== thisTodo.todo_note ||
+        todosArray[index].is_urgent !== thisTodo.is_urgent) {
+          axios.put(`http://localhost:5001/api/todos/${thisTodo.id}`, {
+            name: thisTodo.name,
+            due_date: thisTodo.due_date,
+            todo_detail: thisTodo.todo_note,
+            is_urgent: thisTodo.is_urgent
           })
-          setTodosB(todosArray)
+          .then(function (response) {
+            console.log(response.status, 'To Do Updated!');
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
         }
     }
-  }
-
+    const handleDelete = (t) => {
+      const todosArray = [...todosB]
+      for (let i = 0; i <= t.length; i++) {
+        const checkedTodo = document.getElementById('todoTable').rows[i + 1].children[0].children[0].children[0].children[0].children[0];
+        console.log(checkedTodo, 'checked')
+          if (checkedTodo.checked === true) {
+            todosArray.forEach(t => {
+              if (t === checkedTodo.id) {
+                todosArray.splice(todosArray.indexOf(t), 1)
+              }
+            })
+            setTodosB(todosArray)
+          }
+      }
+    }
 
     useEffect(() => {
         const timer = setInterval(() => setTime(moment().format('MMMM Do YYYY, h:mm:ss a')), 1000 );
@@ -119,7 +161,7 @@ function App() {
               date_created: todo.date_created,
               todo_note: (!todo.todo_detail) ? null : todo.todo_detail,
               due_date: (!todo.due_date) ? null : todo.due_date,
-              isUrgent: (!todo.is_urgent) ? null : todo.is_urgent,
+              is_urgent: (!todo.is_urgent) ? null : todo.is_urgent,
             });
           });
           
@@ -144,23 +186,31 @@ function App() {
                   <Card.Body>
                     <Card.Title><img src={logo} alt='Logo' style={{ width: 100, height: 100 }} /> To Do App</Card.Title>
                       <CreateTodo
-                      value={todoB || ""}
                       todoB={todoB}
+                      todosB={todosB}
+                      filterTodos={filterTodos}
                       setTodoB={setTodoB}
                       addTodo={addTodo}
+                      preventDuplicates={preventDuplicates}
                       />
                       <ToDoDetail
+                      value={value}
+                      checked={checked}
                       thisTodo={thisTodo}
+                      setThisTodo={setThisTodo}
                       todosB={todosB}
-                      editTodos={editTodos}
-                      editTodo={editTodo}
-                      setEditTodo={setEditTodo}
+                      setTodosB={setTodosB}
                       show={show}
+                      setChecked={setChecked}
+                      setValue={setValue}
                       setShow={setShow}
+                      checkInput={checkInput}
+                      updateToDo={updateToDo}
+                      preventDuplicates={preventDuplicates}
+                      handleUpdate={handleUpdate}
                       />
                       <Todos 
                       todosB={todosB}
-                      editTodo={editTodo}
                       getThisTodo={getThisTodo}
                       />
                       <Button variant="danger" style={{backgroundColor: '#dc3545'}} onClick={() => handleDelete(todosB)}>Delete</Button>

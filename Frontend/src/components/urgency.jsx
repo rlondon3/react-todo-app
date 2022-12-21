@@ -1,15 +1,16 @@
 import Form from 'react-bootstrap/Form';
 
-function UrgencySwitch({ handleChange, value }) {
+function UrgencySwitch({ onChange, checked }) {
+
   return (
     <Form>
       <Form.Check
-        name='isUrgent' 
+        name='is_urgent' 
         type="switch"
         id="custom-switch"
-        label="isUrgent"
-        onChange={handleChange}
-        checked={!value}
+        label="is_urgent"
+        onChange={onChange}
+        checked={!checked}
       />
     </Form>
   );

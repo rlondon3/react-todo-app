@@ -6,13 +6,11 @@ import Moment from 'react-moment';
 import 'moment-timezone';
 
 
-const Todos = ({ todosB, getThisTodo, editTodo }) => {
+const Todos = ({ todosB, getThisTodo }) => {
   const [isChecked, setIsChecked] = useState(false);
   const [checked, setChecked] = useState(false);
 
   const toggleCheck = (inputName) => {
-    console.log(editTodo, 'EDIT')
-    //showButtons(!buttons)
     setChecked((prevState) => {
       const newState = { ...prevState };
       newState[inputName] = !prevState[inputName];
@@ -34,7 +32,6 @@ const Todos = ({ todosB, getThisTodo, editTodo }) => {
 
 
     useEffect(() => {
-      
       let allChecked = true;
 
       for (const inputName in checked) {
@@ -76,7 +73,7 @@ const Todos = ({ todosB, getThisTodo, editTodo }) => {
         </thead>
         <tbody>
           {todosB.map((t, index) => (
-          <tr key={index} id={todosB[todosB.indexOf(t)]}>
+          <tr key={index} id={t.name}>
             <td>
           <Form>
         {['checkbox'].map((type) => (

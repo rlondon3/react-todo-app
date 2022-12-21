@@ -5,35 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import moment from 'moment';
 
-const CreateTodo = ({ value, todoB, addTodo, setTodoB }) => {
-  
-  function checkInput() {
-    if (!todoB) {
-      document.getElementById('todoInput').style.borderColor = 'red';
-      document.getElementById('todoInput').classList = 'form-control shadow-none';
-      return;
-    } else {
-      document.getElementById('todoInput').style.removeProperty('border-color');
-      document.getElementById('todoInput').classList = 'form-control';
-    }
-  }
-
-  function filterTodos(t) {
-    const table = document.getElementById('todoTable');
-    const tr = table.getElementsByTagName('tr');
-
-    for (let i = 0; i < tr.length; i++) {
-      if (tr[i]) {
-        if (tr[i].id.toLowerCase() === document.getElementById('todoInput').value.toLowerCase()) {
-          tr[i].style.backgroundColor = 'rgb(184, 201, 204)';
-        } else if (document.getElementById('todoInput').value === '') {
-          tr[i].style.backgroundColor = '';
-        } else if (tr[i].id.toLowerCase() !== document.getElementById('todoInput').value.toLowerCase()) {
-          tr[i].style.backgroundColor = ''; 
-        }
-      }
-    }
-  }
+const CreateTodo = ({ preventDuplicates, filterTodos, todosB, setTodoB, addTodo }) => {
 
   function handleChange(e) {
     const t = e.target.value;
@@ -48,11 +20,20 @@ const CreateTodo = ({ value, todoB, addTodo, setTodoB }) => {
 
   function handleSubmit(e) {
     e.preventDefault();
+
+    const input = document.getElementById('todoInput')
+    const todosArray = [...todosB];
+
+    for (let i = 0; i < todosArray.length; i++) {
+      if (input.value === todosArray[i].name) {
+        return preventDuplicates();
+      }
+    } 
+
+    if (e.key === 'Enter') return input.value;
+    input.value = '';
+    addTodo()
     
-    if (e.key === 'Enter') return value;
-    document.getElementById('todoInput').value = '';
-    checkInput();
-    addTodo();
   }
   
   return (
