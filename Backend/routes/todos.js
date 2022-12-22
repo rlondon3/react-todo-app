@@ -20,7 +20,6 @@ router.post('/', async (req, res) => {
     const result = handleErrors(req.body);
 
     if (result.error)  return res.status(400).send(result.error.details[0].message);
-
     const todo = new Todo({
         name: req.body.name,
         due_date: req.body.due_date,
@@ -53,8 +52,7 @@ router.put('/:id', async (req, res) => {
 });
 //Delete todo
 router.delete('/:id', async (req, res) => {
-    const todo = await Todo.findByIdAndRemove(req.params.id);
-
+    const todo = await Todo.findByIdAndRemove(req.params.id.trim());
     if (!todo) return res.status(404).send('Todo does not exist!');
     res.send(todo);
 })
