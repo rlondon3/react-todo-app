@@ -8,7 +8,7 @@ function UrgencySwitch({ onChange, checked }) {
         name='is_urgent' 
         type="switch"
         id="custom-switch"
-        label="is_urgent"
+        label="Urgent"
         onChange={onChange}
         checked={!checked}
       />

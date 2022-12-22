@@ -5,14 +5,14 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import moment from 'moment';
 
-const CreateTodo = ({ preventDuplicates, filterTodos, todosB, setTodoB, addTodo }) => {
+const CreateTodo = ({ preventDuplicates, filterTodos, todosB, setTodoB, handleAdd }) => {
 
   function handleChange(e) {
     const t = e.target.value;
     const date = moment().format('L');
     const todoArr = {
       name: t,
-      date_created: date
+      date_created: date,
     };
     setTodoB(todoArr)
     filterTodos(t.toLowerCase())
@@ -32,8 +32,7 @@ const CreateTodo = ({ preventDuplicates, filterTodos, todosB, setTodoB, addTodo 
 
     if (e.key === 'Enter') return input.value;
     input.value = '';
-    addTodo()
-    
+    handleAdd()
   }
   
   return (

@@ -18,34 +18,34 @@ const Todos = ({ todosB, getThisTodo }) => {
     });
   };
 
-    const allChecked = (value) => {
-      setIsChecked(value);
+  const allChecked = (value) => {
+    setIsChecked(value);
+    
+    setChecked((prevState) => {
+      const newState = { ...prevState };
       
-      setChecked((prevState) => {
-        const newState = { ...prevState };
-        for (const inputName in newState) {
-          newState[inputName] = value;
-        }
-        return newState;
-      });
-    };
-
-
-    useEffect(() => {
-      let allChecked = true;
-
-      for (const inputName in checked) {
-        if (checked[inputName] === false) {
-          allChecked = false;
-        }
+      for (const inputName in newState) {
+        newState[inputName] = value;
       }
+      return newState;
+    });
+  };
 
-      if (allChecked) {
-        setIsChecked(true);
-      } else {
-        setIsChecked(false);
+  useEffect(() => {
+    let allChecked = true;
+
+    for (const inputName in checked) {
+      if (checked[inputName] === false) {
+        allChecked = false;
       }
-    }, [checked]);
+    }
+
+    if (allChecked) {
+      setIsChecked(true);
+    } else {
+      setIsChecked(false);
+    }
+  }, [checked]);
 
   return (
     <>
@@ -80,10 +80,10 @@ const Todos = ({ todosB, getThisTodo }) => {
           <div key={`default-${type}`} className="mb-3">
             <Form.Check 
               type={type}
-              id={`${todosB[todosB.indexOf(t)]}`}
+              id={t.name}
               label={`Created On `}
               onChange={() => toggleCheck(t)}
-              checked={checked[t]}
+              checked={checked[t.name]}
             />
             <Moment format="MM/DD/YYYY" utc>{t.date_created}</Moment>
           </div>

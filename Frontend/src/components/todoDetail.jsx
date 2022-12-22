@@ -1,21 +1,32 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import UrgencySwitch from './urgency';
 import Calendar from 'react-calendar';
 import moment from 'moment/moment';
 import 'moment-timezone';
 
-const ToDoDetail = ({ value, checked, todosB, thisTodo, show, setShow, setChecked, setThisTodo, setTodosB, setValue, preventDuplicates, checkInput, updateToDo, handleUpdate}) => {
-    
+const ToDoDetail = ({ value, todosB, thisTodo, show, setShow, setThisTodo, setTodosB, setValue, preventDuplicates, checkInput, handleUpdate}) => {
+  const [urgencyChecked, setUrgencyChecked] = useState("");
+  const [checked, setChecked] = useState(false);
+  
     const handleClose = (e) => {
         setShow(false);
     };
     
     function onChange (e) {
       const fields = e.target.name;
-      setChecked(!checked);
+      if (e.target.name === 'is_urgent') {
+        setUrgencyChecked(!urgencyChecked)
+      }
+      if (e.target.name === 'activateDueDate') {
+          setValue(value)
+          setChecked(!checked);
+      }
+
       setThisTodo(existingVal => ({
           ...existingVal,
           [fields]: e.target.value,
@@ -67,12 +78,12 @@ const ToDoDetail = ({ value, checked, todosB, thisTodo, show, setShow, setChecke
               <br />
               {
               (thisTodo.due_date !== null) ? 
-              <Form.Label>Current Due Date: {moment(thisTodo.due_date).format('L')}</Form.Label> :
+              <Form.Label>Active Due Date: {moment(thisTodo.due_date).format('L')}</Form.Label> :
               <Form.Label>Set Due Date: {moment(value).format('L')}</Form.Label>
               }
               <Calendar
                 name='todo_date'
-                //defaultValue={(thisTodo.due_date !== null) ? new Date(thisTodo.due_date) : value}
+                defaultValue={(thisTodo.due_date !== null) ? new Date(thisTodo.due_date) : value}
                 value={value}
                 onChange={(value) => setValue(value)}
               />
@@ -92,11 +103,30 @@ const ToDoDetail = ({ value, checked, todosB, thisTodo, show, setShow, setChecke
                />
             </Form.Group>
           </Form>
-          <UrgencySwitch
-          onChange={onChange}
-          updateToDo={updateToDo}
-          checked={checked}
-          />
+          <Container>
+            <Row>
+              <Col>
+                  <Form.Check
+                    name='is_urgent' 
+                    type="switch"
+                    id="custom-switch"
+                    label="Urgent"
+                    onChange={onChange}
+                    checked={urgencyChecked}
+                  />
+              </Col>
+              <Col>
+                  <Form.Check
+                    name='activateDueDate' 
+                    type="switch"
+                    id="custom-switch"
+                    label="Activate Date"
+                    onChange={onChange}
+                  />
+              </Col>
+            </Row>
+        </Container>
+         
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

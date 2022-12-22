@@ -26,7 +26,7 @@ function App() {
   const [show, setShow] = useState(false);
   const [todosB, setTodosB] = useState([]);
   const [todoB, setTodoB] = useState("");
-  const [checked, setChecked] = useState(false);
+  
   
   const [thisTodo, setThisTodo] = useState("");
   
@@ -53,7 +53,6 @@ function App() {
         }
       }
     }
-    //addTodo();
   }
 
   function filterTodos(t) {
@@ -72,17 +71,47 @@ function App() {
       }
     }
   }
+
+  const getThisTodo = (t) => {
+    if (todosB[todosB.indexOf(t)] === t ) {
+      setShow(true);
+      setThisTodo(t)
+    }
+  }
+
+  const handleGetTodos = async () => {
+    try {
+      const response = await axios.get("http://localhost:5001/api/todos");
+      const fetchedTodosB = [...todosB];  
+
+      response.data.forEach((todo) => {
+        fetchedTodosB.push({
+          id: todo._id,
+          name: todo.name,
+          date_created: todo.date_created,
+          todo_note: (!todo.todo_detail) ? null : todo.todo_detail,
+          due_date: (!todo.due_date) ? null : todo.due_date,
+          is_urgent: (!todo.is_urgent) ? null : todo.is_urgent,
+        });
+      });
+      setTodosB(fetchedTodosB);
+    } catch (error) {
+      console.error(error);
+    }
+  }
   
-  const addTodo = () => {
+  const handleAdd = () => {
     const todosArrayB = [...todosB]
       if (todosB.indexOf(todoB) === -1) {
-        todosArrayB.push(todoB);
-        setTodosB(todosArrayB);
+        
         if (todoB !== "" ){
           axios.post('http://localhost:5001/api/todos', {
             name: todoB.name,
           })
           .then(function (response) {
+            todosArrayB.push(response.data);
+            todosB.push(response.data)
+            //setTodosB(todosArrayB);
             console.log(response.status, 'To Do Added!');
           })
           .catch(function (error) {
@@ -92,25 +121,15 @@ function App() {
       }
     }
 
-    const getThisTodo = (t) => {
-      if (todosB[todosB.indexOf(t)] === t ) {
-        setShow(true);
-        setThisTodo(t)
-      }
-    }
-
-    const updateToDo = e => {
-     
-    }
     const handleUpdate = () => {
       const todosArray = [...todosB]
       const index = todosArray.findIndex(obj => obj.id === thisTodo.id);
-      console.log(thisTodo.due_date, todosArray[index].due_date)
+      
       if (todosArray[index].name !== thisTodo.name || 
         todosArray[index].due_date !== thisTodo.due_date ||
         todosArray[index].todo_note !== thisTodo.todo_note ||
         todosArray[index].is_urgent !== thisTodo.is_urgent) {
-          axios.put(`http://localhost:5001/api/todos/${thisTodo.id}`, {
+          axios.put(`http://localhost:5001/api/todos/${(thisTodo.id) ? thisTodo.id : thisTodo._id}`, {
             name: thisTodo.name,
             due_date: thisTodo.due_date,
             todo_detail: thisTodo.todo_note,
@@ -125,17 +144,25 @@ function App() {
         }
     }
     const handleDelete = (t) => {
-      const todosArray = [...todosB]
-      for (let i = 0; i <= t.length; i++) {
-        const checkedTodo = document.getElementById('todoTable').rows[i + 1].children[0].children[0].children[0].children[0].children[0];
-        console.log(checkedTodo, 'checked')
+      const todosArray = [...todosB];
+      console.log(t, 'todo in delete')
+      for (let i = 1; i <= t.length; i++) {
+        const checkedTodo = document.getElementById('todoTable').rows[i].children[0].children[0].children[0].children[0].children[0];
           if (checkedTodo.checked === true) {
             todosArray.forEach(t => {
-              if (t === checkedTodo.id) {
-                todosArray.splice(todosArray.indexOf(t), 1)
+              if (t.name === checkedTodo.id) {
+                axios.delete(`http://localhost:5001/api/todos/${(t.id) ? t.id : t._id}`, {})
+                .then(function (response) {
+                  todosArray.splice(todosArray.indexOf(t), 1);
+                  setTodosB(todosArray);
+                  console.log(response.status, 'To Do(s) Deleted');
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
               }
             })
-            setTodosB(todosArray)
+            
           }
       }
     }
@@ -149,29 +176,8 @@ function App() {
       }, [time]);
 
     useEffect(() => {
-      async function fetchTodos() {
-        try {
-          const response = await axios.get("http://localhost:5001/api/todos");
-          const fetchedTodosB = [...todosB];  
-
-          response.data.forEach((todo) => {
-            fetchedTodosB.push({
-              id: todo._id,
-              name: todo.name,
-              date_created: todo.date_created,
-              todo_note: (!todo.todo_detail) ? null : todo.todo_detail,
-              due_date: (!todo.due_date) ? null : todo.due_date,
-              is_urgent: (!todo.is_urgent) ? null : todo.is_urgent,
-            });
-          });
-          
-          setTodosB(fetchedTodosB);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      fetchTodos();
+      
+      handleGetTodos();
       // eslint-disable-next-line
     }, []); 
 
@@ -190,22 +196,19 @@ function App() {
                       todosB={todosB}
                       filterTodos={filterTodos}
                       setTodoB={setTodoB}
-                      addTodo={addTodo}
+                      handleAdd={handleAdd}
                       preventDuplicates={preventDuplicates}
                       />
                       <ToDoDetail
                       value={value}
-                      checked={checked}
                       thisTodo={thisTodo}
-                      setThisTodo={setThisTodo}
-                      todosB={todosB}
-                      setTodosB={setTodosB}
                       show={show}
-                      setChecked={setChecked}
+                      todosB={todosB}
+                      setThisTodo={setThisTodo}
+                      setTodosB={setTodosB}
                       setValue={setValue}
                       setShow={setShow}
                       checkInput={checkInput}
-                      updateToDo={updateToDo}
                       preventDuplicates={preventDuplicates}
                       handleUpdate={handleUpdate}
                       />
