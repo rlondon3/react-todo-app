@@ -1,6 +1,6 @@
 # React-Todo-App
 
-# Getting Started with React-Todo-App
+# Explore this app: [React Todo App](https://myreacttodoapp-9.netlify.app/)
 
 ## Scripts
 In the frontend folder you'll need to run
