@@ -1,4 +1,4 @@
-# React-Todo-App
+# React-Todo-App [![Netlify Status](https://api.netlify.com/api/v1/badges/5742fccb-a596-41d3-84dc-9e315add7c67/deploy-status)](https://app.netlify.com/sites/myreacttodoapp-9/deploys)
 
 ### Explore this app: [React Todo App](https://myreacttodoapp-9.netlify.app/)
 
