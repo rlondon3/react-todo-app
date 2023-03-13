@@ -21,7 +21,7 @@ function App() {
     todo_detail: "",
     id: ""
   };
-  
+
   const [value, setValue] = useState(new Date());
   const [time, setTime] = useState(moment().format('LTS'));
   const [show, setShow] = useState(false);
@@ -82,7 +82,7 @@ function App() {
 
   const handleGetTodos = async () => {
     try {
-      const response = await axios.get(process.env.TODOS);
+      const response = await axios.get(`${process.env.TODOS}`);
       const fetchedTodosB = [...todosB];  
 
       response.data.forEach((todo) => {
@@ -106,7 +106,7 @@ function App() {
       if (todosB.indexOf(todoB) === -1) {
         
         if (todoB !== "" ){
-          axios.post(process.env.HOST, {
+          axios.post(`${process.env.TODOS}`, {
             name: todoB.name,
           })
           .then(function (response) {
