@@ -21,6 +21,7 @@ function App() {
     todo_detail: "",
     id: ""
   };
+  
   const [value, setValue] = useState(new Date());
   const [time, setTime] = useState(moment().format('LTS'));
   const [show, setShow] = useState(false);
@@ -81,7 +82,7 @@ function App() {
 
   const handleGetTodos = async () => {
     try {
-      const response = await axios.get("http://localhost:5001/api/todos");
+      const response = await axios.get(process.env.TODOS);
       const fetchedTodosB = [...todosB];  
 
       response.data.forEach((todo) => {
@@ -105,13 +106,12 @@ function App() {
       if (todosB.indexOf(todoB) === -1) {
         
         if (todoB !== "" ){
-          axios.post('http://localhost:5001/api/todos', {
+          axios.post(process.env.HOST, {
             name: todoB.name,
           })
           .then(function (response) {
             todosArrayB.push(response.data);
             todosB.push(response.data)
-            //setTodosB(todosArrayB);
             console.log(response.status, 'To Do Added!');
           })
           .catch(function (error) {
@@ -129,7 +129,7 @@ function App() {
         todosArray[index].due_date !== thisTodo.due_date ||
         todosArray[index].todo_note !== thisTodo.todo_note ||
         todosArray[index].is_urgent !== thisTodo.is_urgent) {
-          axios.put(`http://localhost:5001/api/todos/${(thisTodo.id) ? thisTodo.id : thisTodo._id}`, {
+          axios.put(`${process.env.TODOS}/${(thisTodo.id) ? thisTodo.id : thisTodo._id}`, {
             name: thisTodo.name,
             due_date: thisTodo.due_date,
             todo_detail: thisTodo.todo_note,
@@ -151,7 +151,7 @@ function App() {
           if (checkedTodo.checked === true) {
             todosArray.forEach(t => {
               if (t.name === checkedTodo.id) {
-                axios.delete(`http://localhost:5001/api/todos/${(t.id) ? t.id : t._id}`, {})
+                axios.delete(`${process.env.TODOS}/${(t.id) ? t.id : t._id}`, {})
                 .then(function (response) {
                   todosArray.splice(todosArray.indexOf(t), 1);
                   setTodosB(todosArray);
