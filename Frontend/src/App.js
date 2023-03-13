@@ -106,6 +106,7 @@ function App() {
       if (todosB.indexOf(todoB) === -1) {
         
         if (todoB !== "" ){
+          //updated url
           axios.post(`${process.env.TODOS}`, {
             name: todoB.name,
           })
