@@ -82,7 +82,7 @@ function App() {
 
   const handleGetTodos = async () => {
     try {
-      const response = await axios.get(`${process.env.TODOS}`);
+      const response = await axios.get(process.env.REACT_APP_TODOS);
       const fetchedTodosB = [...todosB];  
 
       response.data.forEach((todo) => {
@@ -107,7 +107,7 @@ function App() {
         
         if (todoB !== "" ){
           //updated url
-          axios.post(`${process.env.TODOS}`, {
+          axios.post(`${process.env.REACT_APP_TODOS}`, {
             name: todoB.name,
           })
           .then(function (response) {
@@ -130,7 +130,7 @@ function App() {
         todosArray[index].due_date !== thisTodo.due_date ||
         todosArray[index].todo_note !== thisTodo.todo_note ||
         todosArray[index].is_urgent !== thisTodo.is_urgent) {
-          axios.put(`${process.env.TODOS}/${(thisTodo.id) ? thisTodo.id : thisTodo._id}`, {
+          axios.put(`${process.env.REACT_APP_TODOS}/${(thisTodo.id) ? thisTodo.id : thisTodo._id}`, {
             name: thisTodo.name,
             due_date: thisTodo.due_date,
             todo_detail: thisTodo.todo_note,
@@ -152,7 +152,7 @@ function App() {
           if (checkedTodo.checked === true) {
             todosArray.forEach(t => {
               if (t.name === checkedTodo.id) {
-                axios.delete(`${process.env.TODOS}/${(t.id) ? t.id : t._id}`, {})
+                axios.delete(`${process.env.REACT_APP_TODOS}/${(t.id) ? t.id : t._id}`, {})
                 .then(function (response) {
                   todosArray.splice(todosArray.indexOf(t), 1);
                   setTodosB(todosArray);

@@ -7,7 +7,7 @@ const router = express.Router();
 //Get all todos
 router.get('/', async (req, res) => {
     const todos = await Todo.find().sort('todo');
-    res.send(todos)
+    res.send(todos);
 });
 //Get todo with detail
 router.get('/:id', async (req, res) => {
@@ -18,7 +18,6 @@ router.get('/:id', async (req, res) => {
 //Create Todo
 router.post('/', async (req, res) => {
     const result = handleErrors(req.body);
-
     if (result.error)  return res.status(400).send(result.error.details[0].message);
     const todo = new Todo({
         name: req.body.name,
@@ -26,6 +25,7 @@ router.post('/', async (req, res) => {
         todo_detail: req.body.todo_detail,
         is_urgent: req.body.is_urgent
     });
+    console.log(todo);
     await todo.save();
     res.send(todo);
 });
